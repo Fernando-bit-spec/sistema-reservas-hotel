@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Dashboard')}"></head>
+<body>
+
+<div th:replace="~{fragments :: nav('home')}"></div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div style="margin-bottom:52px; padding-bottom:40px; border-bottom:1px solid var(--border);">
+    <div class="page-eyebrow fade-up">Sistema de Gestão</div>
+    <h1 class="page-title fade-up fade-up-1" style="font-size:48px;">
+      Bem-vindo ao<br>
+      <span style="color:var(--gold);"> Hotel</span>
+    </h1>
+    <p class="page-desc fade-up fade-up-2" style="font-size:15px; margin-top:10px; max-width:500px;">
+      Gerencie quartos, usuários e reservas em um só lugar. Sistema completo desenvolvido em Spring Boot.
+    </p>
+    <div style="display:flex; gap:12px; margin-top:28px;" class="fade-up fade-up-3">
+      <a href="/reservas/nova" class="btn btn-primary">＋ Nova Reserva</a>
+      <a href="/quartos" class="btn btn-ghost">Ver Quartos</a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid-3 fade-up fade-up-2" style="margin-bottom:40px;">
+    <div class="card" style="border-left: 3px solid var(--gold);">
+      <div class="page-eyebrow" style="margin-bottom:12px;">Total</div>
+      <div class="stat-value" th:text="${totalQuartos}">0</div>
+      <div class="stat-label"> Quartos cadastrados</div>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--success);">
+      <div class="page-eyebrow" style="margin-bottom:12px;">Total</div>
+      <div class="stat-value" th:text="${totalUsuarios}" style="color:var(--success);">0</div>
+      <div class="stat-label"> Usuários cadastrados</div>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--info);">
+      <div class="page-eyebrow" style="margin-bottom:12px;">Total</div>
+      <div class="stat-value" th:text="${totalReservas}" style="color:var(--info);">0</div>
+      <div class="stat-label"> Reservas realizadas</div>
+    </div>
+  </div>
+
+  <!-- QUICK ACCESS -->
+  <div class="grid-3 fade-up fade-up-3">
+    <a href="/quartos" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; padding:32px 24px; text-align:center;">
+        <div style="font-size:36px; margin-bottom:16px;">🛏</div>
+        <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; margin-bottom:6px;">Quartos</div>
+        <div style="font-size:12px; color:var(--muted2);">Cadastrar e gerenciar quartos do hotel</div>
+      </div>
+    </a>
+    <a href="/usuarios" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; padding:32px 24px; text-align:center;">
+        <div style="font-size:36px; margin-bottom:16px;">👤</div>
+        <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; margin-bottom:6px;">Usuários</div>
+        <div style="font-size:12px; color:var(--muted2);">Gerenciar clientes e administradores</div>
+      </div>
+    </a>
+    <a href="/reservas" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; padding:32px 24px; text-align:center;">
+        <div style="font-size:36px; margin-bottom:16px;">📋</div>
+        <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; margin-bottom:6px;">Reservas</div>
+        <div style="font-size:12px; color:var(--muted2);">Criar, consultar e cancelar reservas</div>
+      </div>
+    </a>
+  </div>
+
+</div>
+</body>
+</html>

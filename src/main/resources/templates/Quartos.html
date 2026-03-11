@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Quartos')}"></head>
+<body>
+
+<div th:replace="~{fragments :: nav('quartos')}"></div>
+
+<div class="page">
+
+  <div class="page-header fade-up">
+    <div class="page-eyebrow">Gestão</div>
+    <h1 class="page-title">Quartos</h1>
+    <p class="page-desc">Cadastre e gerencie os quartos do hotel.</p>
+  </div>
+
+  <!-- ALERTS -->
+  <div th:if="${sucesso}" class="alert alert-success fade-up">
+    ✓ <span th:text="${sucesso}"></span>
+  </div>
+  <div th:if="${erro}" class="alert alert-error fade-up">
+    ✕ <span th:text="${erro}"></span>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="grid-3 fade-up fade-up-1" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="stat-value" th:text="${quartosDisponiveis}">0</div>
+      <div class="stat-label">✅ Disponíveis</div>
+    </div>
+    <div class="card">
+      <div class="stat-value" th:text="${quartosOcupados}" style="color:var(--danger);">0</div>
+      <div class="stat-label">🔴 Ocupados</div>
+    </div>
+    <div class="card">
+      <div class="stat-value" th:text="${quartosManutencao}" style="color:var(--muted2);">0</div>
+      <div class="stat-label">🔧 Em Manutenção</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="fade-up fade-up-2">
+    <div class="toolbar">
+      <span class="toolbar-title">Todos os Quartos</span>
+      <button class="btn btn-primary" onclick="abrirModal('modal-novo')">＋ Novo Quarto</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+        <tr>
+          <th>Número</th>
+          <th>Tipo</th>
+          <th>Preço / diária</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="quarto : ${quartos}">
+          <td>
+                            <span style="font-family:'DM Mono',monospace; font-weight:500; color:var(--gold);"
+                                  th:text="'#' + ${quarto.numero}"></span>
+          </td>
+          <td th:text="${quarto.tipo}">—</td>
+          <td>
+            <span style="font-weight:600;" th:text="'R$ ' + ${#numbers.formatDecimal(quarto.preco, 1, 2)}"></span>
+          </td>
+          <td>
+                            <span th:switch="${quarto.status}">
+                                <span th:case="'DISPONIVEL'" class="badge badge-green">● Disponível</span>
+                                <span th:case="'OCUPADO'"    class="badge badge-red">● Ocupado</span>
+                                <span th:case="'MANUTENCAO'" class="badge badge-gray">● Manutenção</span>
+                            </span>
+          </td>
+          <td>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-ghost btn-sm"
+                      th:onclick="|editarQuarto(${quarto.id}, '${quarto.numero}', '${quarto.tipo}', ${quarto.preco}, '${quarto.status}')|">
+                ✏ Editar
+              </button>
+              <form th:action="@{/quartos/{id}/excluir(id=${quarto.id})}" method="post"
+                    onsubmit="return confirm('Excluir este quarto?')">
+                <button type="submit" class="btn btn-danger btn-sm">🗑 Excluir</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(quartos)}">
+          <td colspan="5" style="text-align:center; color:var(--muted); padding:40px;">
+            Nenhum quarto cadastrado ainda.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO QUARTO -->
+<div class="modal-overlay" id="modal-novo">
+  <div class="modal">
+    <div class="modal-title">Novo Quarto</div>
+    <div class="modal-sub">Preencha os dados do quarto</div>
+    <form th:action="@{/quartos}" method="post">
+      <div class="form-group">
+        <label>Número</label>
+        <input type="text" name="numero" placeholder="Ex: 101" required/>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select name="tipo">
+            <option value="SOLTEIRO">Solteiro</option>
+            <option value="CASAL">Casal</option>
+            <option value="SUITE">Suíte</option>
+            <option value="DELUXE">Deluxe</option>
+            <option value="PRESIDENCIAL">Presidencial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="DISPONIVEL">Disponível</option>
+            <option value="OCUPADO">Ocupado</option>
+            <option value="MANUTENCAO">Manutenção</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Preço por diária (R$)</label>
+        <input type="number" name="preco" step="0.01" min="0" placeholder="Ex: 350.00" required/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="fecharModal('modal-novo')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Cadastrar Quarto</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL EDITAR QUARTO -->
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal">
+    <div class="modal-title">Editar Quarto</div>
+    <div class="modal-sub">Altere os dados do quarto</div>
+    <form id="form-editar" method="post">
+      <div class="form-group">
+        <label>Número</label>
+        <input type="text" id="edit-numero" name="numero" required/>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="edit-tipo" name="tipo">
+            <option value="SOLTEIRO">Solteiro</option>
+            <option value="CASAL">Casal</option>
+            <option value="SUITE">Suíte</option>
+            <option value="DELUXE">Deluxe</option>
+            <option value="PRESIDENCIAL">Presidencial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="edit-status" name="status">
+            <option value="DISPONIVEL">Disponível</option>
+            <option value="OCUPADO">Ocupado</option>
+            <option value="MANUTENCAO">Manutenção</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Preço por diária (R$)</label>
+        <input type="number" id="edit-preco" name="preco" step="0.01" min="0" required/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="fecharModal('modal-editar')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+  function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  function editarQuarto(id, numero, tipo, preco, status) {
+      document.getElementById('edit-numero').value = numero;
+      document.getElementById('edit-tipo').value = tipo;
+      document.getElementById('edit-preco').value = preco;
+      document.getElementById('edit-status').value = status;
+      document.getElementById('form-editar').action = '/quartos/' + id + '/atualizar';
+      abrirModal('modal-editar');
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+          if (e.target === overlay) overlay.classList.remove('open');
+      });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Reservas')}"></head>
+<body>
+
+<div th:replace="~{fragments :: nav('reservas')}"></div>
+
+<div class="page">
+
+  <div class="page-header fade-up">
+    <div class="page-eyebrow">Gestão</div>
+    <h1 class="page-title">Reservas</h1>
+    <p class="page-desc">Crie, consulte e gerencie todas as reservas do hotel.</p>
+  </div>
+
+  <!-- ALERTS -->
+  <div th:if="${sucesso}" class="alert alert-success fade-up">
+    ✓ <span th:text="${sucesso}"></span>
+  </div>
+  <div th:if="${erro}" class="alert alert-error fade-up">
+    ✕ <span th:text="${erro}"></span>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid-3 fade-up fade-up-1" style="margin-bottom:32px;">
+    <div class="card">
+      <div class="stat-value" th:text="${totalConfirmadas}" style="color:var(--success);">0</div>
+      <div class="stat-label">✅ Confirmadas</div>
+    </div>
+    <div class="card">
+      <div class="stat-value" th:text="${totalPendentes}" style="color:var(--gold);">0</div>
+      <div class="stat-label">⏳ Pendentes</div>
+    </div>
+    <div class="card">
+      <div class="stat-value" th:text="${totalCanceladas}" style="color:var(--danger);">0</div>
+      <div class="stat-label">✕ Canceladas</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="fade-up fade-up-2">
+    <div class="toolbar">
+      <span class="toolbar-title">Todas as Reservas</span>
+      <button class="btn btn-primary" onclick="abrirModal('modal-novo')">＋ Nova Reserva</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Hóspede</th>
+          <th>Quarto</th>
+          <th>Check-in</th>
+          <th>Check-out</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reserva : ${reservas}">
+          <td>
+                            <span style="font-family:'DM Mono',monospace; color:var(--muted2); font-size:12px;"
+                                  th:text="'#' + ${reserva.id}"></span>
+          </td>
+          <td style="font-weight:500;" th:text="${reserva.nomeUsuario}">—</td>
+          <td>
+                            <span style="font-family:'DM Mono',monospace; color:var(--gold);"
+                                  th:text="'Quarto ' + ${reserva.numeroQuarto}"></span>
+          </td>
+          <td th:text="${reserva.dataEntrada}">—</td>
+          <td th:text="${reserva.dataSaida}">—</td>
+          <td>
+                            <span th:switch="${reserva.status}">
+                                <span th:case="'CONFIRMADA'" class="badge badge-green">✓ Confirmada</span>
+                                <span th:case="'PENDENTE'"   class="badge badge-gold">⏳ Pendente</span>
+                                <span th:case="'CANCELADA'"  class="badge badge-red">✕ Cancelada</span>
+                                <span th:case="'CONCLUIDA'"  class="badge badge-gray">◎ Concluída</span>
+                            </span>
+          </td>
+          <td>
+            <div style="display:flex; gap:8px;">
+              <form th:if="${reserva.status != 'CANCELADA' and reserva.status != 'CONCLUIDA'}"
+                    th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post"
+                    onsubmit="return confirm('Cancelar esta reserva?')">
+                <button type="submit" class="btn btn-danger btn-sm">✕ Cancelar</button>
+              </form>
+              <span th:if="${reserva.status == 'CANCELADA' or reserva.status == 'CONCLUIDA'}"
+                    style="color:var(--muted); font-size:12px; padding:6px 0;">—</span>
+            </div>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(reservas)}">
+          <td colspan="7" style="text-align:center; color:var(--muted); padding:40px;">
+            Nenhuma reserva encontrada.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVA RESERVA -->
+<div class="modal-overlay" id="modal-novo">
+  <div class="modal">
+    <div class="modal-title">Nova Reserva</div>
+    <div class="modal-sub">Preencha os dados da reserva</div>
+    <form th:action="@{/reservas}" method="post">
+      <div class="form-group">
+        <label>Hóspede</label>
+        <select name="usuarioId" required>
+          <option value="">Selecione o hóspede...</option>
+          <option th:each="u : ${usuarios}"
+                  th:value="${u.id}"
+                  th:text="${u.nome} + ' (' + ${u.email} + ')'"></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quarto</label>
+        <select name="quartoId" required>
+          <option value="">Selecione o quarto...</option>
+          <option th:each="q : ${quartos}"
+                  th:value="${q.id}"
+                  th:text="'Quarto ' + ${q.numero} + ' — ' + ${q.tipo} + ' (R$ ' + ${q.preco} + ')'"></option>
+        </select>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Check-in</label>
+          <input type="date" name="dataEntrada" required/>
+        </div>
+        <div class="form-group">
+          <label>Check-out</label>
+          <input type="date" name="dataSaida" required/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="fecharModal('modal-novo')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+  function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+          if (e.target === overlay) overlay.classList.remove('open');
+      });
+  });
+
+  // Set min date to today for date inputs
+  const hoje = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type="date"]').forEach(input => {
+      input.min = hoje;
+  });
+</script>
+</body>
+</html>
