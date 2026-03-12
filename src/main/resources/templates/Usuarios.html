@@ -7,171 +7,184 @@
 
 <div class="page">
 
-  <div class="page-header fade-up">
-    <div class="page-eyebrow">Gestão</div>
-    <h1 class="page-title">Usuários</h1>
-    <p class="page-desc">Gerencie clientes e administradores do sistema.</p>
-  </div>
-
-  <!-- ALERTS -->
-  <div th:if="${sucesso}" class="alert alert-success fade-up">
-    ✓ <span th:text="${sucesso}"></span>
-  </div>
-  <div th:if="${erro}" class="alert alert-error fade-up">
-    ✕ <span th:text="${erro}"></span>
-  </div>
-
-  <!-- STATS -->
-  <div class="grid-2 fade-up fade-up-1" style="margin-bottom:32px; max-width:500px;">
-    <div class="card">
-      <div class="stat-value" th:text="${totalClientes}">0</div>
-      <div class="stat-label">👤 Clientes</div>
-    </div>
-    <div class="card">
-      <div class="stat-value" th:text="${totalAdmins}" style="color:var(--gold);">0</div>
-      <div class="stat-label">⚙ Administradores</div>
-    </div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="fade-up fade-up-2">
-    <div class="toolbar">
-      <span class="toolbar-title">Todos os Usuários</span>
-      <button class="btn btn-primary" onclick="abrirModal('modal-novo')">＋ Novo Usuário</button>
+    <div class="page-header fade-up">
+        <div class="page-eyebrow">Gestão</div>
+        <h1 class="page-title">Usuários</h1>
+        <p class="page-desc">Gerencie clientes e administradores do sistema.</p>
     </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Tipo</th>
-          <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="usuario : ${usuarios}">
-          <td>
+    <!-- ALERTS -->
+    <div th:if="${sucesso}" class="alert alert-success fade-up">
+        ✓ <span th:text="${sucesso}"></span>
+    </div>
+    <div th:if="${erro}" class="alert alert-error fade-up">
+        ✕ <span th:text="${erro}"></span>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid-2 fade-up fade-up-1" style="margin-bottom:32px; max-width:500px;">
+        <div class="card">
+            <div class="stat-value" th:text="${totalClientes}">0</div>
+            <div class="stat-label">👤 Clientes</div>
+        </div>
+        <div class="card">
+            <div class="stat-value" th:text="${totalAdmins}" style="color:var(--gold);">0</div>
+            <div class="stat-label">⚙ Administradores</div>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="fade-up fade-up-2">
+        <div class="toolbar">
+            <span class="toolbar-title">Todos os Usuários</span>
+            <button class="btn btn-primary" onclick="abrirModal('modal-novo')">＋ Novo Usuário</button>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Tipo</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td>
                             <span style="font-family:'DM Mono',monospace; color:var(--muted2); font-size:12px;"
                                   th:text="'#' + ${usuario.id}"></span>
-          </td>
-          <td style="font-weight:500;" th:text="${usuario.nome}">—</td>
-          <td style="color:var(--muted2); font-size:13px;" th:text="${usuario.email}">—</td>
-          <td>
+                    </td>
+                    <td style="font-weight:500;" th:text="${usuario.nome}">—</td>
+                    <td style="color:var(--muted2); font-size:13px;" th:text="${usuario.email}">—</td>
+                    <td>
                             <span th:switch="${usuario.tipo}">
-                                <span th:case="'ADMIN'"   class="badge badge-gold">⚙ Admin</span>
+                                <span th:case="'ADMIN'" class="badge badge-gold">⚙ Admin</span>
                                 <span th:case="'CLIENTE'" class="badge badge-blue">👤 Cliente</span>
                             </span>
-          </td>
-          <td>
-            <div style="display:flex; gap:8px;">
-              <button class="btn btn-ghost btn-sm"
-                      th:onclick="|editarUsuario(${usuario.id}, '${usuario.nome}', '${usuario.email}', '${usuario.tipo}')|">
-                ✏ Editar
-              </button>
-              <form th:action="@{/usuarios/{id}/excluir(id=${usuario.id})}" method="post"
-                    onsubmit="return confirm('Excluir este usuário?')">
-                <button type="submit" class="btn btn-danger btn-sm">🗑 Excluir</button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(usuarios)}">
-          <td colspan="5" style="text-align:center; color:var(--muted); padding:40px;">
-            Nenhum usuário cadastrado ainda.
-          </td>
-        </tr>
-        </tbody>
-      </table>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-ghost btn-sm"
+                                    th:data-id="${usuario.id}"
+                                    th:data-nome="${usuario.nome}"
+                                    th:data-email="${usuario.email}"
+                                    th:data-tipo="${usuario.tipo}"
+                                    onclick="editarUsuarioBt(this)"
+                                    ✏ Editar
+                            </button>
+                            <form th:action="@{/usuarios/{id}/excluir(id=${usuario.id})}" method="post"
+                                  onsubmit="return confirm('Excluir este usuário?')">
+                                <button type="submit" class="btn btn-danger btn-sm">🗑 Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(usuarios)}">
+                    <td colspan="5" style="text-align:center; color:var(--muted); padding:40px;">
+                        Nenhum usuário cadastrado ainda.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- MODAL NOVO USUÁRIO -->
 <div class="modal-overlay" id="modal-novo">
-  <div class="modal">
-    <div class="modal-title">Novo Usuário</div>
-    <div class="modal-sub">Preencha os dados do usuário</div>
-    <form th:action="@{/usuarios}" method="post">
-      <div class="form-group">
-        <label>Nome completo</label>
-        <input type="text" name="nome" placeholder="Ex: João Silva" required/>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" placeholder="Ex: joao@email.com" required/>
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" name="senha" placeholder="Mínimo 6 caracteres" required/>
-      </div>
-      <div class="form-group">
-        <label>Tipo de usuário</label>
-        <select name="tipo">
-          <option value="CLIENTE">Cliente</option>
-          <option value="ADMIN">Administrador</option>
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-ghost" onclick="fecharModal('modal-novo')">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Cadastrar Usuário</button>
-      </div>
-    </form>
-  </div>
+    <div class="modal">
+        <div class="modal-title">Novo Usuário</div>
+        <div class="modal-sub">Preencha os dados do usuário</div>
+        <form th:action="@{/usuarios}" method="post">
+            <div class="form-group">
+                <label>Nome completo</label>
+                <input type="text" name="nome" placeholder="Ex: João Silva" required/>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Ex: joao@email.com" required/>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" name="senha" placeholder="Mínimo 6 caracteres" required/>
+            </div>
+            <div class="form-group">
+                <label>Tipo de usuário</label>
+                <select name="tipo">
+                    <option value="CLIENTE">Cliente</option>
+                    <option value="ADMIN">Administrador</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="fecharModal('modal-novo')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Cadastrar Usuário</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- MODAL EDITAR USUÁRIO -->
 <div class="modal-overlay" id="modal-editar">
-  <div class="modal">
-    <div class="modal-title">Editar Usuário</div>
-    <div class="modal-sub">Altere os dados do usuário</div>
-    <form id="form-editar" method="post">
-      <div class="form-group">
-        <label>Nome completo</label>
-        <input type="text" id="edit-nome" name="nome" required/>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="edit-email" name="email" required/>
-      </div>
-      <div class="form-group">
-        <label>Nova senha (deixe em branco para manter)</label>
-        <input type="password" name="senha" placeholder="Nova senha"/>
-      </div>
-      <div class="form-group">
-        <label>Tipo de usuário</label>
-        <select id="edit-tipo" name="tipo">
-          <option value="CLIENTE">Cliente</option>
-          <option value="ADMIN">Administrador</option>
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-ghost" onclick="fecharModal('modal-editar')">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-      </div>
-    </form>
-  </div>
+    <div class="modal">
+        <div class="modal-title">Editar Usuário</div>
+        <div class="modal-sub">Altere os dados do usuário</div>
+        <form id="form-editar" method="post">
+            <div class="form-group">
+                <label>Nome completo</label>
+                <input type="text" id="edit-nome" name="nome" required/>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="edit-email" name="email" required/>
+            </div>
+            <div class="form-group">
+                <label>Nova senha (deixe em branco para manter)</label>
+                <input type="password" name="senha" placeholder="Nova senha"/>
+            </div>
+            <div class="form-group">
+                <label>Tipo de usuário</label>
+                <select id="edit-tipo" name="tipo">
+                    <option value="CLIENTE">Cliente</option>
+                    <option value="ADMIN">Administrador</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="fecharModal('modal-editar')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
-  function abrirModal(id) { document.getElementById(id).classList.add('open'); }
-  function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+    function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+    function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
 
-  function editarUsuario(id, nome, email, tipo) {
-      document.getElementById('edit-nome').value = nome;
-      document.getElementById('edit-email').value = email;
-      document.getElementById('edit-tipo').value = tipo;
-      document.getElementById('form-editar').action = '/usuarios/' + id + '/atualizar';
-      abrirModal('modal-editar');
-  }
+    function editarUsuario(id, nome, email, tipo) {
+        document.getElementById('edit-nome').value = nome;
+        document.getElementById('edit-email').value = email;
+        document.getElementById('edit-tipo').value = tipo;
+        document.getElementById('form-editar').action = '/usuarios/' + id + '/atualizar';
+        abrirModal('modal-editar');
 
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', e => {
-          if (e.target === overlay) overlay.classList.remove('open');
-      });
-  });
+        function editarUsuarioBt(btn) {
+    editarUsuario(
+        btn.getAttribute('data-id'),
+        btn.getAttribute('data-nome'),
+        btn.getAttribute('data-email'),
+        btn.getAttribute('data-tipo')
+    );
+}
+    }
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay) overlay.classList.remove('open');
+        });
+    });
 </script>
 </body>
 </html>
