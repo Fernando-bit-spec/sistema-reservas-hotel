@@ -172,23 +172,7 @@ Para rodar o projeto localmente você vai precisar de Java 17+, Maven 3.9+ e MyS
 CREATE DATABASE hotel;
 ```
 
-### 2. Configurar `application.properties`
 
-```properties
-spring.application.name=hotel-reservas
-
-# URL local para desenvolvimento
-spring.datasource.url=jdbc:mysql://localhost:3306/hotel
-spring.datasource.username=root
-spring.datasource.password=SUA_SENHA
-
-# Porta dinâmica (necessário para o Railway)
-server.port=${PORT:8080}
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
-```
 
 > As tabelas são criadas automaticamente pelo Hibernate na primeira execução graças ao `ddl-auto=update`.
 
@@ -211,17 +195,7 @@ Para o banco de dados, o Railway fornece um plugin MySQL com as variáveis de co
 
 ---
 
-## 🔒 Validações de Negócio
 
-O sistema aplica diversas regras antes de confirmar uma reserva. A data de saída deve ser posterior à data de entrada. Quartos com status `MANUTENCAO` não podem ser reservados. O sistema verifica conflito de datas via JPQL antes de confirmar:
-
-```sql
-SELECT COUNT(r) > 0 FROM Reserva r
-WHERE r.quarto.id = :quartoId
-  AND r.status NOT IN ('CANCELADA')
-  AND r.dataEntrada < :dataSaida
-  AND r.dataSaida > :dataEntrada
-```
 
 Além disso, o email de cada usuário deve ser único, o número de cada quarto deve ser único, e reservas com status `CONCLUIDA` não podem ser canceladas.
 
