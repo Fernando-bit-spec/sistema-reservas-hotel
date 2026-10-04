@@ -6,7 +6,9 @@ import com.fernando.hotelreservas.exception.BusinessException;
 import com.fernando.hotelreservas.exception.ResourceNotFoundException;
 import com.fernando.hotelreservas.model.Usuario;
 import com.fernando.hotelreservas.repository.UsuarioRepository;
+import com.fernando.hotelreservas.util.ErrorMessageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,17 +20,19 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ErrorMessageUtil errorMessageUtil;
 
     @Transactional
     public UsuarioDTO.Response cadastrar(UsuarioDTO.Request request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessException("Email já está em uso: " + request.getEmail());
+            throw new BusinessException(errorMessageUtil.getDuplicateEmailMessage(request.getEmail()));
         }
 
         Usuario usuario = Usuario.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
-                .senha(request.getSenha()) // em produção: hash da senha
+                .senha(passwordEncoder.encode(request.getSenha()))
                 .tipo(request.getTipo())
                 .build();
 
@@ -37,10 +41,10 @@ public class UsuarioService {
 
     public UsuarioDTO.Response login(UsuarioDTO.LoginRequest request) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BusinessException("Email ou senha inválidos"));
+                .orElseThrow(() -> new BusinessException(errorMessageUtil.getInvalidCredentialsMessage()));
 
-        if (!usuario.getSenha().equals(request.getSenha())) {
-            throw new BusinessException("Email ou senha inválidos");
+        if (!passwordEncoder.matches(request.getSenha(), usuario.getSenha())) {
+            throw new BusinessException(errorMessageUtil.getInvalidCredentialsMessage());
         }
 
         return toResponse(usuario);
@@ -62,12 +66,14 @@ public class UsuarioService {
         Usuario usuario = findById(id);
 
         if (request.getNome() != null) usuario.setNome(request.getNome());
-        if (request.getSenha() != null) usuario.setSenha(request.getSenha());
+        if (request.getSenha() != null && !request.getSenha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(request.getSenha()));
+        }
         if (request.getTipo() != null) usuario.setTipo(request.getTipo());
         if (request.getEmail() != null) {
             if (!request.getEmail().equals(usuario.getEmail())
                     && usuarioRepository.existsByEmail(request.getEmail())) {
-                throw new BusinessException("Email já está em uso: " + request.getEmail());
+                throw new BusinessException(errorMessageUtil.getDuplicateEmailMessage(request.getEmail()));
             }
             usuario.setEmail(request.getEmail());
         }
@@ -78,14 +84,14 @@ public class UsuarioService {
     @Transactional
     public void excluir(Long id) {
         if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuário não encontrado com id: " + id);
+            throw new ResourceNotFoundException(errorMessageUtil.getResourceNotFoundMessage("Usuário", id));
         }
         usuarioRepository.deleteById(id);
     }
 
     private Usuario findById(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(errorMessageUtil.getResourceNotFoundMessage("Usuário", id)));
     }
 
     private UsuarioDTO.Response toResponse(Usuario usuario) {
