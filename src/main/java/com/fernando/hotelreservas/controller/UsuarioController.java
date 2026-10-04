@@ -6,6 +6,7 @@ import com.fernando.hotelreservas.model.Usuario.TipoUsuario;
 import com.fernando.hotelreservas.repository.UsuarioRepository;
 import com.fernando.hotelreservas.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,35 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository;
 
+    /**
+     * Exibe a página de cadastro (público)
+     */
+    @GetMapping("/registro")
+    public String mostrarFormularioCadastro(Model model) {
+        model.addAttribute("usuario", new UsuarioDTO.Request());
+        return "registro";
+    }
+
+    /**
+     * Processa o cadastro de novo usuário (público)
+     */
+    @PostMapping("/registro")
+    public String processarCadastro(@ModelAttribute UsuarioDTO.Request request,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            // Novos usuários sempre começam como CLIENTE
+            request.setTipo(TipoUsuario.CLIENTE);
+            usuarioService.cadastrar(request);
+            redirectAttributes.addFlashAttribute("sucesso", "Cadastro realizado com sucesso! Agora faça login.");
+            return "redirect:/login";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+            return "redirect:/usuarios/registro";
+        }
+    }
+
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public String listar(Model model) {
         model.addAttribute("usuarios", usuarioService.listarTodos());
         model.addAttribute("totalClientes",
@@ -32,6 +61,7 @@ public class UsuarioController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public String cadastrar(@ModelAttribute UsuarioDTO.Request request,
                             RedirectAttributes redirectAttributes) {
         try {
@@ -44,6 +74,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/{id}/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     public String atualizar(@PathVariable Long id,
                             @ModelAttribute UsuarioDTO.UpdateRequest request,
                             RedirectAttributes redirectAttributes) {
@@ -61,6 +92,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/{id}/excluir")
+    @PreAuthorize("hasRole('ADMIN')")
     public String excluir(@PathVariable Long id,
                           RedirectAttributes redirectAttributes) {
         try {
