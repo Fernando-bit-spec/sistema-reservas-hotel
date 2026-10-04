@@ -4,6 +4,13 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Environment files (NEVER commit) ###
+.env
+.env.local
+.env.*.local
+application-prod.properties
+application-prod*.properties
+
 ### STS ###
 .apt_generated
 .classpath
@@ -31,3 +38,4 @@ build/
 
 ### VS Code ###
 .vscode/
+
