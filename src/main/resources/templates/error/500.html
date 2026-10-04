@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Erro Interno do Servidor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            padding: 60px 40px;
+            max-width: 600px;
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 20px;
+            line-height: 1;
+        }
+
+        .error-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <div class="error-code">500</div>
+        <h1 class="error-title">Erro Interno do Servidor</h1>
+        <p class="error-message">
+            Algo deu errado no servidor.<br>
+            Nossa equipe foi notificada. Tente novamente mais tarde.
+        </p>
+        <a href="/" class="back-button">← Voltar à página inicial</a>
+    </div>
+</body>
+</html>
