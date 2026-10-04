@@ -5,6 +5,7 @@ import com.fernando.hotelreservas.model.Quarto.StatusQuarto;
 import com.fernando.hotelreservas.repository.QuartoRepository;
 import com.fernando.hotelreservas.service.QuartoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class QuartoController {
     private final QuartoRepository quartoRepository;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public String listar(Model model) {
         model.addAttribute("quartos", quartoService.listarTodos());
         model.addAttribute("quartosDisponiveis",
@@ -31,6 +33,7 @@ public class QuartoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public String cadastrar(@ModelAttribute QuartoDTO.Request request,
                             RedirectAttributes redirectAttributes) {
         try {
@@ -43,6 +46,7 @@ public class QuartoController {
     }
 
     @PostMapping("/{id}/atualizar")
+    @PreAuthorize("hasRole('ADMIN')")
     public String atualizar(@PathVariable Long id,
                             @ModelAttribute QuartoDTO.UpdateRequest request,
                             RedirectAttributes redirectAttributes) {
@@ -56,6 +60,7 @@ public class QuartoController {
     }
 
     @PostMapping("/{id}/excluir")
+    @PreAuthorize("hasRole('ADMIN')")
     public String excluir(@PathVariable Long id,
                           RedirectAttributes redirectAttributes) {
         try {
