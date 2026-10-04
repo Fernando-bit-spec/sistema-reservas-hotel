@@ -7,6 +7,7 @@ import com.fernando.hotelreservas.service.QuartoService;
 import com.fernando.hotelreservas.service.ReservaService;
 import com.fernando.hotelreservas.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class ReservaController {
     private final ReservaRepository reservaRepository;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public String listar(Model model) {
         model.addAttribute("reservas",  reservaService.listarTodas());
         model.addAttribute("usuarios",  usuarioService.listarTodos());
@@ -37,6 +39,7 @@ public class ReservaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public String criar(@ModelAttribute ReservaDTO.Request request,
                         RedirectAttributes redirectAttributes) {
         try {
@@ -49,6 +52,7 @@ public class ReservaController {
     }
 
     @PostMapping("/{id}/cancelar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public String cancelar(@PathVariable Long id,
                            RedirectAttributes redirectAttributes) {
         try {
